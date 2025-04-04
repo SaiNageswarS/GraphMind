@@ -1,0 +1,14 @@
+Given the following list of files from a git repository and the repository URL, generate an RDF graph in Turtle format. Include the following details:
+- repoType (e.g., monorepo, microservice)
+- language (the main programming language)
+- framework (if any)
+- entryPoint (the primary entry point file or command)
+- externalServices (any external services the repository connects to)
+- repoUrl (the URL of the repository)
+
+File List:
+{{.FileList}}
+
+Repository URL: {{.RepoURL}}
+
+Please output a valid RDF graph in Turtle format with these details.

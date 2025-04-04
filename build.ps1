@@ -1,0 +1,1 @@
+go build -mod=mod -o build/ .
