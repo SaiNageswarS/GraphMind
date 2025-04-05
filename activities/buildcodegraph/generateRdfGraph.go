@@ -65,7 +65,7 @@ func (a *Activities) GenerateRDFGraph(ctx context.Context, state BuildCodeGraphS
 	}
 
 	// 8. Write the RDF content to a file.
-	rdfPath, err := WriteRdf(response)
+	rdfPath, err := WriteStringToFile(response, "", "repo_metadata_*.ttl")
 	if err != nil {
 		return state, fmt.Errorf("failed to write RDF file: %w", err)
 	}

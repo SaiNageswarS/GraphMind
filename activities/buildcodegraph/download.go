@@ -14,6 +14,7 @@ type BuildCodeGraphState struct {
 	LocalRepoPath            string // The local path to the cloned repository.
 	RepoRdfGraph             string // The RDF graph generated from the repository files.
 	AstControlFlowFolderPath string // The path to the folder containing AST control flow files.
+	AstControlRdfGraph       string // The RDF graph generated from the AST control flow files.
 }
 
 // Activities defines all build_code_graph activities

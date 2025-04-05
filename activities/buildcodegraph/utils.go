@@ -82,8 +82,8 @@ func ReadFileToString(filePath string) (string, error) {
 	return string(data), nil
 }
 
-func WriteRdf(content string) (string, error) {
-	tempFile, err := os.CreateTemp("", "output_*_rdf")
+func WriteStringToFile(content, filePath, pattern string) (string, error) {
+	tempFile, err := os.CreateTemp(filePath, pattern)
 	if err != nil {
 		fmt.Printf("Error creating temp file: %v\n", err)
 		return "", err
@@ -111,4 +111,60 @@ func ExtractTurtleRDF(text string) (string, error) {
 		return "", fmt.Errorf("no turtle RDF found")
 	}
 	return matches[1], nil
+}
+
+func CallClaudeApi(ctx context.Context, prompt string) (string, error) {
+	apiKey := os.Getenv("CLAUDE_API_KEY")
+	if apiKey == "" {
+		return "", fmt.Errorf("CLAUDE_API_KEY environment variable not set")
+	}
+
+	// Prepare the request payload for Claude API.
+	payload := map[string]interface{}{
+		"model": "claude-3-5-sonnet-20241022",
+		"messages": []map[string]string{
+			{
+				"role":    "user",
+				"content": prompt,
+			},
+		},
+		"max_tokens": 2048,
+	}
+	payloadBytes, err := json.Marshal(payload)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal payload: %w", err)
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://api.anthropic.com/v1/messages", bytes.NewBuffer(payloadBytes))
+	if err != nil {
+		return "", fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("x-api-key", apiKey)
+	req.Header.Set("anthropic-version", "2023-06-01")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("failed to call Claude API: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return "", fmt.Errorf("claude api error: %s", string(bodyBytes))
+	}
+
+	var result struct {
+		Content []struct {
+			Type string `json:"type"`
+			Text string `json:"text"`
+		} `json:"content"`
+	}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil || len(result.Content) == 0 {
+		return "", fmt.Errorf("failed to decode Claude response: %w", err)
+	}
+
+	return strings.TrimSpace(result.Content[0].Text), nil
 }

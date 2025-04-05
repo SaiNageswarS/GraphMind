@@ -43,5 +43,13 @@ func BuildCodeGraphWorkflow(ctx workflow.Context, state buildcodegraph.BuildCode
 		}
 	}
 
+	// 4. BuildAstRdf Activity: Generate RDF from the AST control flow files.
+	if state.AstControlRdfGraph == "" {
+		err := workflow.ExecuteActivity(ctx, activities.BuildAstRdf, state).Get(ctx, &state)
+		if err != nil {
+			return state, err
+		}
+	}
+
 	return state, nil
 }

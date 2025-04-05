@@ -1,0 +1,21 @@
+You are provided with two inputs:
+1. The repository-level RDF graph in Turtle format.
+2. The API control flow source code for one API endpoint.
+
+Your task is to generate an RDF fragment (in Turtle format) that describes the API with the following requirements:
+- Include a brief description of the API based on the control flow.
+- Provide a unique identifier (URI) for the API (which can be derived from the file name or internal hints).
+- Identify all external dependencies, particularly any databases. For each database dependency, include additional details such as the database name and type (for example, MongoDB, PostgreSQL, MySQL, etc.). If the control flow code hints at a specific database type or name (e.g., via connection strings, import statements, or variable names), use that information. Otherwise, indicate that the database type is "unknown".
+- List any cloud resources (such as FileStorage, KeyVault, etc.) that the API interacts with.
+- List any other microservices by name that are called by the API.
+- Link this API’s RDF fragment to the cumulative RDF graph.
+
+After generating the RDF fragment for the current API, combine it with the existing RDF graph and output the complete, valid RDF graph in Turtle format.
+
+Cumulative RDF Graph (ExistingApiRDF):
+{{.ProjectRDF}}
+
+API Control Flow Source Code:
+{{.ApiControlFlow}}
+
+Please output the complete, combined RDF graph in Turtle format, ensuring that each external dependency (including databases) includes as much detail as possible.
