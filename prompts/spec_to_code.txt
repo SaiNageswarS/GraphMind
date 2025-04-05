@@ -1,0 +1,35 @@
+You are provided with two inputs:
+
+Specification:
+{{.Spec}}
+
+Combined RDF Graph:
+{{.CombinedRdf}}
+
+Objective:
+Analyze the given specification and the RDF graph of the system. Your goal is to identify specific paths, control flows, and components that must be modified to satisfy the specification. For each required change, please provide:
+
+- The Git repository where the change should occur.
+- The specific API or APIs (endpoints, services, or modules) that need modification.
+- A brief explanation of why this part of the system needs to change based on the spec and its current control flow.
+
+Instructions:
+
+- Review the specification to determine the functional or architectural changes required.
+- Examine the RDF graph to locate the corresponding control flows, API endpoints, and dependencies.
+- Map the identified changes to the relevant Git repositories and APIs.
+- Output your findings as a structured list.
+
+Expected Output Format:
+
+Repository: <repo-name-or-url>
+  - API/Module: <API or module name>
+    - Affected Path/Control Flow: <description of the RDF node/edge path>
+    - Reason for Change: <brief explanation>
+
+Repository: <repo-name-or-url>
+  - API/Module: <API or module name>
+    - Affected Path/Control Flow: <description of the RDF node/edge path>
+    - Reason for Change: <brief explanation>
+    
+Please analyze the provided inputs and return the list of repositories and APIs that need to change, along with the necessary details as per the expected format.

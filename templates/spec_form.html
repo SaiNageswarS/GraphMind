@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>GraphMind Spec Input</title>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" crossorigin="anonymous">
+  <style>
+    body {
+      padding-top: 2rem;
+      background-color: #f8f9fa;
+    }
+    .container {
+      max-width: 1200px;
+    }
+    /* Flex container for equal height columns */
+    .equal-height {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+    }
+    /* Each column takes equal available height */
+    .equal-height > .col-md-6 {
+      display: flex;
+      flex-direction: column;
+    }
+    /* Form wrapper to fill the column height */
+    .form-wrapper {
+      flex: 1;
+    }
+    /* Visualizer should match the form height but with fixed height for visualizer container */
+    .visualizer-wrapper {
+      flex: 1;
+    }
+    .visualizer {
+      height: 500px;  /* Fixed height prevents uncontrolled growth */
+      max-height: 500px;
+      border: 1px solid #ddd;
+      background-color: #fff;
+      overflow: auto; /* In case graph content exceeds container */
+    }
+    /* LLM output full width styling */
+    .output-area {
+      background-color: #e9ecef;
+      padding: 1rem;
+      border-radius: 4px;
+      min-height: 150px;
+      white-space: pre-wrap;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4">GraphMind Specification</h1>
+    <!-- Flex row for form and visualizer with equal height -->
+    <div class="row equal-height">
+      <div class="col-md-6">
+        <div class="form-wrapper">
+          <!-- Spec Input Form -->
+          <form id="specForm" method="post" action="/">
+            <div class="form-group">
+              <label for="specInput">Specification</label>
+              <textarea class="form-control" id="specInput" name="spec" rows="10" placeholder="Enter your specification here...">{{.Spec}}</textarea>
+            </div>
+            <div class="form-group">
+              <label for="graphLocation">Graph File Location</label>
+              <input type="text" class="form-control" id="graphLocation" name="graphLocation" placeholder="/path/to/combined_graph.ttl" value="{{.GraphLocation}}">
+            </div>
+            <button type="submit" class="btn btn-primary">Analyze Spec</button>
+          </form>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="visualizer-wrapper">
+          <!-- RDF Graph Visualizer -->
+          <h4>RDF Graph Visualizer</h4>
+          <div id="cy" class="visualizer"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Full width LLM output section -->
+    <div class="row mt-4">
+      <div class="col">
+        <h4>LLM Output</h4>
+        <div id="llmOutput" class="output-area">
+          {{if .Result}}
+            {{.Result}}
+          {{else}}
+            <em>LLM output will be displayed here after processing...</em>
+          {{end}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery and Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+  <!-- Cytoscape.js for RDF Graph Visualization -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.19.1/cytoscape.min.js" crossorigin="anonymous"></script>
+  <script>
+    // Initialize Cytoscape with a sample graph.
+    var cy = cytoscape({
+      container: document.getElementById('cy'),
+      elements: [
+        // Example nodes and edge.
+        { data: { id: 'a', label: 'Node A' } },
+        { data: { id: 'b', label: 'Node B' } },
+        { data: { source: 'a', target: 'b', label: 'edge from A to B' } }
+      ],
+      style: [
+        {
+          selector: 'node',
+          style: {
+            'label': 'data(label)',
+            'text-valign': 'center',
+            'color': '#fff',
+            'background-color': '#007bff',
+            'width': '40px',
+            'height': '40px'
+          }
+        },
+        {
+          selector: 'edge',
+          style: {
+            'width': 3,
+            'line-color': '#ccc',
+            'target-arrow-color': '#ccc',
+            'target-arrow-shape': 'triangle',
+            'curve-style': 'bezier',
+            'label': 'data(label)',
+            'font-size': '10px'
+          }
+        }
+      ],
+      layout: {
+        name: 'grid',
+        rows: 1
+      }
+    });
+
+    // Optionally, add logic here to update Cytoscape with your RDF data.
+  </script>
+</body>
+</html>

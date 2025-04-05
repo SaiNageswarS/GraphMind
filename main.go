@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/SaiNageswarS/GraphMind/activities/buildcodegraph"
+	"github.com/SaiNageswarS/GraphMind/services"
 	"github.com/SaiNageswarS/GraphMind/workflows"
 	"go.temporal.io/sdk/client"
 	"go.temporal.io/sdk/worker"
@@ -28,6 +29,9 @@ func main() {
 	w.RegisterWorkflow(workflows.BuildCodeGraphWorkflow)
 	w.RegisterWorkflow(workflows.BuildMultipleCodeGraphsWorkflow)
 	w.RegisterActivity(&buildcodegraph.Activities{})
+
+	// Start the HTTP server in a separate goroutine.
+	go services.StartHTTPServer()
 
 	// Start listening to the Task Queue.
 	err = w.Run(worker.InterruptCh())
