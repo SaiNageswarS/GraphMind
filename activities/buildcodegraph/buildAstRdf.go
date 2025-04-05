@@ -9,7 +9,7 @@ import (
 )
 
 func (a *Activities) BuildAstRdf(ctx context.Context, state BuildCodeGraphState) (BuildCodeGraphState, error) {
-	tmpDir, err := os.MkdirTemp("", "rdfControlFlow-*")
+	tmpDir, _ := os.MkdirTemp("", "rdfControlFlow-*")
 
 	files, err := getFileList(state.AstControlFlowFolderPath)
 	if err != nil {

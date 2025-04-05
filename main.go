@@ -26,6 +26,7 @@ func main() {
 
 	// Register the workflow and activities.
 	w.RegisterWorkflow(workflows.BuildCodeGraphWorkflow)
+	w.RegisterWorkflow(workflows.BuildMultipleCodeGraphsWorkflow)
 	w.RegisterActivity(&buildcodegraph.Activities{})
 
 	// Start listening to the Task Queue.
