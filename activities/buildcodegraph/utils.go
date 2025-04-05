@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -72,20 +73,20 @@ func CallOpenAI(ctx context.Context, prompt string) (string, error) {
 	return strings.TrimSpace(result.Choices[0].Message.Content), nil
 }
 
-func ReadFileToString(filePath string) string {
+func ReadFileToString(filePath string) (string, error) {
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		fmt.Printf("Error reading file %s: %v\n", filePath, err)
-		return ""
+		return "", err
 	}
-	return string(data)
+	return string(data), nil
 }
 
-func WriteRdf(content string) string {
+func WriteRdf(content string) (string, error) {
 	tempFile, err := os.CreateTemp("", "output_*_rdf")
 	if err != nil {
 		fmt.Printf("Error creating temp file: %v\n", err)
-		return ""
+		return "", err
 	}
 	// Ensure the file is closed and cleaned up as needed.
 	defer tempFile.Close()
@@ -93,9 +94,21 @@ func WriteRdf(content string) string {
 	// Write the content to the temporary file.
 	if _, err := tempFile.WriteString(content); err != nil {
 		fmt.Printf("Error writing to temp file: %v\n", err)
-		return ""
+		return "", err
 	}
 
 	// Return the full path to the temporary file.
-	return tempFile.Name()
+	return tempFile.Name(), nil
+}
+
+// extractTurtleRDF extracts the Turtle RDF content from the given text.
+func ExtractTurtleRDF(text string) (string, error) {
+	// (?s) enables dotall mode so that '.' matches newline characters.
+	// The regex captures text between ```turtle and the closing ``` markers.
+	re := regexp.MustCompile("(?s)```turtle\\s*(.*?)\\s*```")
+	matches := re.FindStringSubmatch(text)
+	if len(matches) < 2 {
+		return "", fmt.Errorf("no turtle RDF found")
+	}
+	return matches[1], nil
 }

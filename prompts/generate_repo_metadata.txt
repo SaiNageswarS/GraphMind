@@ -1,14 +1,18 @@
-Given the following list of files from a git repository and the repository URL, generate an RDF graph in Turtle format. Include the following details:
-- repoType (e.g., monorepo, microservice)
-- language (the main programming language)
-- framework (if any)
-- entryPoint (the primary entry point file or command)
-- externalServices (any external services the repository connects to)
-- repoUrl (the URL of the repository)
+Given the following list of files from a git repository, the contents of any configuration files (go.mod, build.gradle, packages.json, or requirements.txt) if available, and the repository URL, generate an RDF graph in Turtle format. Use the configuration file contents to help determine the programming language and framework.
+
+Based on the above inputs, generate an RDF graph that includes only the following details:
+- repoUrl: The URL of the git repository.
+- language: The primary programming language (e.g., Go, Java, JavaScript, Python).
+- framework: The main framework used (if any).
+- name: A short, human-friendly name for the repository.
+- repoType: A classification of the repository (e.g., monorepo, microservice).
 
 File List:
 {{.FileList}}
 
+Configuration Files Content:
+{{.AdditionalInfo}}
+
 Repository URL: {{.RepoURL}}
 
-Please output a valid RDF graph in Turtle format with these details.
+Please output a valid RDF graph in Turtle format containing only the above details.
