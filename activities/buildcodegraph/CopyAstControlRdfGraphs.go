@@ -45,6 +45,12 @@ func (a *Activities) CopyAstControlRdfGraphs(results []BuildCodeGraphState, comm
 		}
 	}
 
+	// Combine all RDF files into a single file.
+	combinedRdfFilePath := filepath.Join(commonFolder, "combined_rdf.ttl")
+	if _, err := CallUnifyRdfsApi(commonFolder, combinedRdfFilePath); err != nil {
+		return fmt.Errorf("failed to combine RDF files: %w", err)
+	}
+
 	return nil
 }
 

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"regexp"
@@ -167,4 +168,49 @@ func CallClaudeApi(ctx context.Context, prompt string) (string, error) {
 	}
 
 	return strings.TrimSpace(result.Content[0].Text), nil
+}
+
+func CallUnifyRdfsApi(rdfsBasePath, outputFile string) (string, error) {
+	// Create the JSON payload.
+	payload := struct {
+		Folder string `json:"folder"`
+		Output string `json:"output"`
+	}{
+		Folder: rdfsBasePath,
+		Output: outputFile,
+	}
+
+	jsonData, err := json.Marshal(payload)
+	if err != nil {
+		return "", fmt.Errorf("failed to marshal JSON: %w", err)
+	}
+
+	// Define the Python API endpoint.
+	url := "http://localhost:5000/unify"
+
+	// Create the POST request.
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Fatalf("Error creating request: %v", err)
+	}
+	req.Header.Set("Content-Type", "application/json")
+
+	// Execute the request.
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalf("Error making request: %v", err)
+	}
+	defer resp.Body.Close()
+
+	// Read the response.
+	var result struct {
+		CombinedGraphPath string `json:"combined_graph_path"`
+	}
+	err = json.NewDecoder(resp.Body).Decode(&result)
+	if err != nil {
+		return "", fmt.Errorf("failed to decode response: %w", err)
+	}
+
+	return result.CombinedGraphPath, nil
 }
