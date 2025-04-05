@@ -34,5 +34,14 @@ func BuildCodeGraphWorkflow(ctx workflow.Context, state buildcodegraph.BuildCode
 		}
 	}
 
+	// 3. BuildAstControlFlow Activity: Generate AST control flow files for the repository.
+	if state.AstControlFlowFolderPath == "" {
+		err := workflow.ExecuteActivity(ctx, activities.BuildAstControlFlow, state).Get(ctx, &state)
+
+		if err != nil {
+			return state, err
+		}
+	}
+
 	return state, nil
 }
