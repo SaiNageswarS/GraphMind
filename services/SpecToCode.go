@@ -42,14 +42,18 @@ func specHandler(w http.ResponseWriter, r *http.Request) {
 		// For instance, you could call a Temporal workflow or a local function.
 		// The following is a dummy output to demonstrate the concept.
 		result := processSpec(spec, graphFile)
+
+		mermaidScript := generateMermaidForSpec(spec, graphFile, result)
 		data := struct {
 			Spec          string
 			GraphLocation string
 			Result        string
+			MermaidScript string
 		}{
 			Spec:          spec,
 			GraphLocation: graphFile,
 			Result:        result,
+			MermaidScript: mermaidScript,
 		}
 		renderTemplate(w, "templates/spec_form.html", data)
 	default:
@@ -97,5 +101,33 @@ func processSpec(spec, graphFile string) string {
 	}
 
 	log.Printf("LLM response: %s", response)
+	return response
+}
+
+func generateMermaidForSpec(spec, graphFile, codeChange string) string {
+	promptFilePath := "prompts/spec_to_mermaid.txt"
+
+	promptTemplate, err := buildcodegraph.ReadFileToString(promptFilePath)
+	if err != nil {
+		log.Printf("Failed to read prompt file: %v", err)
+		return "Error reading prompt file."
+	}
+
+	graphFileContent, err := buildcodegraph.ReadFileToString(graphFile)
+	if err != nil {
+		log.Printf("Failed to read graph file: %v", err)
+		return "Error reading graph file."
+	}
+
+	prompt := strings.ReplaceAll(promptTemplate, "{{.Spec}}", spec)
+	prompt = strings.ReplaceAll(prompt, "{{.CombinedRdf}}", graphFileContent)
+	prompt = strings.ReplaceAll(prompt, "{{.CodeChangeApproach}}", codeChange)
+
+	response, err := buildcodegraph.CallClaudeApi(context.Background(), prompt)
+	if err != nil {
+		log.Printf("LLM call failed: %v", err)
+		return "LLM call failed."
+	}
+
 	return response
 }

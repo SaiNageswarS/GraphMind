@@ -1,0 +1,14 @@
+You are a software architect AI.
+
+Based on the following specification, RDF control flow graph, and the following code change approach, generate a Mermaid.js flowchart to visualize the path of code changes.
+
+Use Mermaid syntax starting with "graph TD". Do not wrap the diagram in triple backticks.
+
+Specification:
+{{.Spec}}
+
+RDF Graph:
+{{.CombinedRdf}}
+
+Code Change Approach:
+{{.CodeChangeApproach}}
