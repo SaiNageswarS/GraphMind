@@ -61,4 +61,10 @@ temporal server start-dev
 cd GraphMindPyAPIs
 python main.py
 
+## 📺 Demo
+
+[![GraphMind Demo](https://img.youtube.com/vi/eHlpDDB8GAE/0.jpg)](https://www.youtube.com/watch?v=eHlpDDB8GAE)
+
+> Click the image above to watch the full walkthrough!
+
 
