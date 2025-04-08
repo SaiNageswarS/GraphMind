@@ -15,7 +15,7 @@ type BuildMultipleCodeGraphsWorkflowInput struct {
 // BuildMultipleCodeGraphsWorkflow takes an array of repo URLs and a common folder (temp folder in this case).
 // It launches the BuildCodeGraphWorkflow as a child workflow for each repo URL and then copies all the generated
 // AstControlRdfGraph files into the common folder.
-func BuildMultipleCodeGraphsWorkflow(ctx workflow.Context, input BuildMultipleCodeGraphsWorkflowInput) error {
+func BuildMultipleCodeGraphsWorkflow(ctx workflow.Context, input BuildMultipleCodeGraphsWorkflowInput) (string, error) {
 	// Set child workflow options.
 	childWorkflowOpts := workflow.ChildWorkflowOptions{
 		WorkflowRunTimeout: time.Minute * 15,
@@ -38,7 +38,7 @@ func BuildMultipleCodeGraphsWorkflow(ctx workflow.Context, input BuildMultipleCo
 	for _, future := range childFutures {
 		var result buildcodegraph.BuildCodeGraphState
 		if err := future.Get(ctx, &result); err != nil {
-			return err
+			return "", err
 		}
 		results = append(results, result)
 	}
@@ -52,9 +52,11 @@ func BuildMultipleCodeGraphsWorkflow(ctx workflow.Context, input BuildMultipleCo
 	activities := &buildcodegraph.Activities{}
 
 	// Call the CopyAstControlRdfGraphs activity with the collected results and the common (temp) folder.
-	if err := workflow.ExecuteActivity(ctx, activities.CopyAstControlRdfGraphs, results, input.CommonFolder).Get(ctx, nil); err != nil {
-		return err
+	var combinedRdfFilePath string
+	err := workflow.ExecuteActivity(ctx, activities.CopyAstControlRdfGraphs, results, input.CommonFolder).Get(ctx, &combinedRdfFilePath)
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	return combinedRdfFilePath, nil
 }
