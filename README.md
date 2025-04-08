@@ -60,6 +60,7 @@ temporal server start-dev
 # Run python rdflib server
 cd GraphMindPyAPIs
 python main.py
+```
 
 ## 📺 Demo
 
